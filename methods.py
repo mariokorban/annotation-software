@@ -184,7 +184,11 @@ def search_bar_previous_annotations(query: str,
         
         if not query_pos:
             if query_filter.match == 'Approximate':
-                if query in ' '.join(annotation.annotation) and \
+                if isinstance(annotation.annotation, list):
+                    condition = query in ' '.join(annotation.annotation)
+                else:
+                    condition = query in annotation.annotation
+                if condition and \
                     (annotation.annotator, annotation.id) not in already_added:
                     response.append(
                         annotations_json[annotation.annotator][annotation.id]['original'])
