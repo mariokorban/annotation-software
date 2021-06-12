@@ -253,6 +253,7 @@
         var beginTags = false
 
         var searchObj = ""
+        var counterIds=0
         // Tags
 
         var pos_vals = ["ABBREV","ADJ","ADJ_COMP","ADJ_NUM","ADV","ADV_INTERROG","ADV_REL","CONJ","CONJ_SUB","DIGIT","FORIEGN","INTERJ","NOUN","NOUN_NUM","NOUN_PROP","NOUN_QUANT","PART","PART_CONNECT","PART_DET","PART_EMPHATIC","PART_FOCUS","PART_FUT","PART_INTERROG","PART_NEG","PART_PROG","PART_RC","PART_RESTRICT","PART_VERB","PART_VOC","PREP","PRON","PRON_DEM","PRON_EXCLAM","PRON_INTERROG","PRON_REL","PUNC","VERB","VERB_NOM","VERB_PSEUDO"]
@@ -506,10 +507,10 @@
             console.log(delimiters)
         }
 
-        function getCorrespondingFeatures(val, position){
+        function getCorrespondingFeatures(selectedInput){
             var aspect =
-                '<label class="form-check-label">Aspect</label>' +
-                '<select name="aspect" class="aspect col-1" id="aspect">' +
+                '<div><label class="form-check-label">Aspect</label></div>' +
+                '<div><select name="aspect" class="aspect col-1" id="aspect"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             aspecT_vals.forEach(a => {
@@ -519,8 +520,8 @@
 
 
             var person =
-                '<label class="form-check-label">Person</label>' +
-                '<select name="person" class="person" id="person">' +
+                '<div><label class="form-check-label">Person</label></div>' +
+                '<div><select name="person" class="person" id="person"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             person_vals.forEach(a => {
@@ -530,8 +531,8 @@
 
 
             var gender =
-                '<label class="form-check-label">Gender</label>' +
-                '<select name="gender" class="gender" id="gender">' +
+                '<div><label class="form-check-label">Gender</label></div>' +
+                '<div><select name="gender" class="gender" id="gender"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             gender_vals.forEach(a => {
@@ -541,8 +542,8 @@
 
 
             var number =
-                '<label class="form-check-label">Number</label>' +
-                '<select name="number" class="number" id="number">' +
+                '<div><label class="form-check-label">Number</label></div>' +
+                '<div><select name="number" class="number" id="number"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             number_vals.forEach(a => {
@@ -552,8 +553,8 @@
 
 
             var state =
-                '<label class="form-check-label">State</label>' +
-                '<select name="state" class="state" id="state">' +
+                '<div><label class="form-check-label">State</label></div>' +
+                '<div><select name="state" class="state" id="state"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             state_vals.forEach(a => {
@@ -563,8 +564,8 @@
 
 
             var voice =
-                '<label class="form-check-label">Voice</label>' +
-                '<select name="voice" class="voice" id="voice">' +
+                '<div><label class="form-check-label">Voice</label></div>' +
+                '<div><select name="voice" class="voice" id="voice"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             voice_vals.forEach(a => {
@@ -574,8 +575,8 @@
 
 
             var mood =
-                '<label class="form-check-label">Mood</label>' +
-                '<select name="mood" class="mood" id="mood">' +
+                '<div><label class="form-check-label">Mood</label></div>' +
+                '<div><select name="mood" class="mood" id="mood"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             mood_vals.forEach(a => {
@@ -584,8 +585,8 @@
             mood += "</select>"
 
             var verbForm =
-                '<label class="form-check-label">Verb Form</label>' +
-                '<select name="verbForm" class="verbForm" id="verbForm">' +
+                '<div><label class="form-check-label">Verb Form</label></div>' +
+                '<div><select name="verbForm" class="verbForm" id="verbForm"></div>' +
                 '<option value="NONE" selected>NONE</option>'
 
             verbForm_vals.forEach(a => {
@@ -593,42 +594,27 @@
             });
             verbForm += "</select>"
             
-            if (val == "ABBREV"){
-                document.getElementById(position).innerHTML += aspect
-                document.getElementById(position).innerHTML += person
-                document.getElementById(position).innerHTML += gender
-                document.getElementById(position).innerHTML += number
-                document.getElementById(position).innerHTML += state
-                document.getElementById(position).innerHTML += voice
-                document.getElementById(position).innerHTML += mood
-                document.getElementById(position).innerHTML += verbForm
+            if (selectedInput.value == "ABBREV") {
+                var abbrevFeatures = aspect + person + gender + number + state + voice + mood + verbForm
+                selectedInput.nextSibling.innerHTML = abbrevFeatures
             }
-            else if (val.startsWith("ADJ")){
-                document.getElementById(position).innerHTML += gender
-                document.getElementById(position).innerHTML += number
-                document.getElementById(position).innerHTML += verbForm
+            else if (selectedInput.value.startsWith("ADJ")) {
+                var adjFeatures = gender + number + verbForm
+                selectedInput.nextSibling.innerHTML = adjFeatures
             }
-            else if (val.startsWith("NOUN")) {
-                document.getElementById(position).innerHTML += gender
-                document.getElementById(position).innerHTML += number
-                document.getElementById(position).innerHTML += state
-                document.getElementById(position).innerHTML += verbForm
+            else if (selectedInput.value.startsWith("NOUN")) {
+                var nounFeatures = gender + number + state + verbForm
+                selectedInput.nextSibling.innerHTML = nounFeatures
             }
-            else if (val.startsWith("PRON")) {
-                document.getElementById(position).innerHTML += person
-                document.getElementById(position).innerHTML += gender
-                document.getElementById(position).innerHTML += number
+            else if (selectedInput.value.startsWith("PRON")) {
+                var pronFeatures = person + gender + number
+                selectedInput.nextSibling.innerHTML = pronFeatures
             }
-            else if (val.startsWith("VERB")) {
-                document.getElementById(position).innerHTML += aspect
-                document.getElementById(position).innerHTML += person
-                document.getElementById(position).innerHTML += gender
-                document.getElementById(position).innerHTML += number
-                document.getElementById(position).innerHTML += voice
-                document.getElementById(position).innerHTML += mood
-                document.getElementById(position).innerHTML += verbForm
+            else if (selectedInput.value.startsWith("VERB")) {
+                var verbFeatures = aspect + person + gender + number + voice + mood + verbForm
+                selectedInput.nextSibling.innerHTML = verbFeatures
             }
-            else{
+            else {
                 null
             }
         }
@@ -642,10 +628,9 @@
                 tags_txt.push(tags)
                 tags = []
             }
-            
             var pos = 
-            '<label class="form-check-label">POS</label>'+
-                    '<select name="pos" class="pos col-1" id="pos" onchange="getCorrespondingFeatures(this.value, newStr);">'+
+            '<label class="form-check-label">POS</label><br/><br/>'+
+                    '<select name="pos" class="pos col-1" onchange="getCorrespondingFeatures(this)"   id="'+ counterIds +'" '+
                         '<option value="NONE" selected>NONE</option>'
 
             pos_vals.forEach(p => {
@@ -656,12 +641,11 @@
             var lemma = '<textarea class="lemma" id="lemma" name="lemma">'+newStr+'</textarea>'
             var flag_Btn = '<button class="n_flag" value="'+newStr+'" onclick="TagSegment(this)">Flag</button></div>'
 
-            document.getElementById("newStrTags").innerHTML += "<div id="+newStr+" class=\"row\" style=\"margin-top: 5%\"><input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%;\">"
-            document.getElementById("newStrTags").innerHTML += pos
+            document.getElementById("newStrTags").innerHTML += "<div  class=\"row\" style=\"margin-top: 5%\">"+ pos +"<div></div> <input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%;\">"
             document.getElementById("newStrTags").innerHTML += lemma
             document.getElementById("newStrTags").innerHTML += flag_Btn
-
             document.getElementById("newStrTags").innerHTML += "</br>"
+            counterIds +=1;
             if (delim==str.length){
                 console.log("TAGS : ",tags_txt)
             }
