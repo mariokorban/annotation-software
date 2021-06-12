@@ -303,7 +303,8 @@ def sync_annotations(repo_dir='/Users/chriscay/thesis/annotation',
     repo.git.fetch()
     remote_branches = repo.git.branch('-r').splitlines()
     remote_branches = [branch.strip()
-                       for branch in remote_branches if re.match(r'\w+/\w+$', branch.strip(), re.M) and 'main' not in branch]
+                       for branch in remote_branches if re.match(r'\w+/\w+$', branch.strip(), re.M) \
+                           and 'main' not in branch and 'resource' not in branch]
     repo.git.checkout('main')
     for branch in remote_branches:
         repo.git.merge(branch.strip())
@@ -319,7 +320,8 @@ def get_merged_json(repo_dir='/Users/chriscay/thesis/annotation',
     annotations_name = f'{annotator_name}_annotations'
     repo = Repo(repo_dir)
     repo.git.checkout(annotations_name)
-    repo.git.add(A=True)
+    annotator_file_path = os.path.join(repo_dir, f'annotations_{annotator_name}.json')
+    repo.index.add([annotator_file_path])
     repo.index.commit('Saving work.')
     repo.git.checkout('main')
     annotator_file_paths = [file_path for file_path in os.listdir(repo_dir) if '.json' in file_path]
