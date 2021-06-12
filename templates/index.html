@@ -506,7 +506,7 @@
             console.log(delimiters)
         }
 
-        function getCorrespondingFeatures(val){
+        function getCorrespondingFeatures(val, position){
             var aspect =
                 '<label class="form-check-label">Aspect</label>' +
                 '<select name="aspect" class="aspect col-1" id="aspect">' +
@@ -594,39 +594,39 @@
             verbForm += "</select>"
             
             if (val == "ABBREV"){
-                document.getElementById("newStrTags").innerHTML += aspect
-                document.getElementById("newStrTags").innerHTML += person
-                document.getElementById("newStrTags").innerHTML += gender
-                document.getElementById("newStrTags").innerHTML += number
-                document.getElementById("newStrTags").innerHTML += state
-                document.getElementById("newStrTags").innerHTML += voice
-                document.getElementById("newStrTags").innerHTML += mood
-                document.getElementById("newStrTags").innerHTML += verbForm
+                document.getElementById(position).innerHTML += aspect
+                document.getElementById(position).innerHTML += person
+                document.getElementById(position).innerHTML += gender
+                document.getElementById(position).innerHTML += number
+                document.getElementById(position).innerHTML += state
+                document.getElementById(position).innerHTML += voice
+                document.getElementById(position).innerHTML += mood
+                document.getElementById(position).innerHTML += verbForm
             }
             else if (val.startsWith("ADJ")){
-                document.getElementById("newStrTags").innerHTML += gender
-                document.getElementById("newStrTags").innerHTML += number
-                document.getElementById("newStrTags").innerHTML += verbForm
+                document.getElementById(position).innerHTML += gender
+                document.getElementById(position).innerHTML += number
+                document.getElementById(position).innerHTML += verbForm
             }
             else if (val.startsWith("NOUN")) {
-                document.getElementById("newStrTags").innerHTML += gender
-                document.getElementById("newStrTags").innerHTML += number
-                document.getElementById("newStrTags").innerHTML += state
-                document.getElementById("newStrTags").innerHTML += verbForm
+                document.getElementById(position).innerHTML += gender
+                document.getElementById(position).innerHTML += number
+                document.getElementById(position).innerHTML += state
+                document.getElementById(position).innerHTML += verbForm
             }
             else if (val.startsWith("PRON")) {
-                document.getElementById("newStrTags").innerHTML += person
-                document.getElementById("newStrTags").innerHTML += gender
-                document.getElementById("newStrTags").innerHTML += number
+                document.getElementById(position).innerHTML += person
+                document.getElementById(position).innerHTML += gender
+                document.getElementById(position).innerHTML += number
             }
             else if (val.startsWith("VERB")) {
-                document.getElementById("newStrTags").innerHTML += aspect
-                document.getElementById("newStrTags").innerHTML += person
-                document.getElementById("newStrTags").innerHTML += gender
-                document.getElementById("newStrTags").innerHTML += number
-                document.getElementById("newStrTags").innerHTML += voice
-                document.getElementById("newStrTags").innerHTML += mood
-                document.getElementById("newStrTags").innerHTML += verbForm
+                document.getElementById(position).innerHTML += aspect
+                document.getElementById(position).innerHTML += person
+                document.getElementById(position).innerHTML += gender
+                document.getElementById(position).innerHTML += number
+                document.getElementById(position).innerHTML += voice
+                document.getElementById(position).innerHTML += mood
+                document.getElementById(position).innerHTML += verbForm
             }
             else{
                 null
@@ -645,7 +645,7 @@
             
             var pos = 
             '<label class="form-check-label">POS</label>'+
-                    '<select name="pos" class="pos col-1" id="pos" onchange="getCorrespondingFeatures(this.value);">'+
+                    '<select name="pos" class="pos col-1" id="pos" onchange="getCorrespondingFeatures(this.value, newStr);">'+
                         '<option value="NONE" selected>NONE</option>'
 
             pos_vals.forEach(p => {
@@ -656,7 +656,7 @@
             var lemma = '<textarea class="lemma" id="lemma" name="lemma">'+newStr+'</textarea>'
             var flag_Btn = '<button class="n_flag" value="'+newStr+'" onclick="TagSegment(this)">Flag</button></div>'
 
-            document.getElementById("newStrTags").innerHTML += "<div class=\"row\" style=\"margin-top: 5%\"><input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%;\">"
+            document.getElementById("newStrTags").innerHTML += "<div id="+newStr+" class=\"row\" style=\"margin-top: 5%\"><input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%;\">"
             document.getElementById("newStrTags").innerHTML += pos
             document.getElementById("newStrTags").innerHTML += lemma
             document.getElementById("newStrTags").innerHTML += flag_Btn
