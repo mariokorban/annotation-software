@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Annotator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <style>
+        /* Center the loader */
+        #load {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 1;
+            width: 120px;
+            height: 120px;
+            margin: -76px 0 0 -76px;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Add animation to "page content" */
+        .animate-bottom {
+            position: relative;
+            -webkit-animation-name: animatebottom;
+            -webkit-animation-duration: 1s;
+            animation-name: animatebottom;
+            animation-duration: 1s
+        }
+
+        @-webkit-keyframes animatebottom {
+            from {
+                bottom: -100px;
+                opacity: 0
+            }
+
+            to {
+                bottom: 0px;
+                opacity: 1
+            }
+        }
+
+        @keyframes animatebottom {
+            from {
+                bottom: -100px;
+                opacity: 0
+            }
+
+            to {
+                bottom: 0;
+                opacity: 1
+            }
+        }
+
+        #myDiv {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div id="load"></div> -->
+    <div
+        class="d-none"
+        id="loading"
+        style="width: 100vw; height:100%;opacity: 0.5;background-color: black ; display: flex; justify-content: center; align-items: center;position: absolute; z-index: 1;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    </div>
+    <div class="container-fluid" id="contents">
+        <div class="row container-fluid">
+            <div class="col-12">
+                <center>
+                    <h1 style="font-size:75px;background-color: blue;color: white;">ANNOTATOR</h1>
+                </center>
+                <p id="state" class="bg-primary"
+                    style="width: fit-content; color: white; padding: 5px; font-weight: bold;"></p>
+                <input type="button" class="btn btn-primary btn-md col-3 offset-1" style="width: 15%;" value="Sync Annotations" onclick="sync()">
+                <input type="button" class="btn btn-primary btn-md col-3 offset-1" style="width: 15%;" value="Set Text"
+                    onclick="SetText()">
+            </div>
+        </div>
+
+        <div class="row container-fluid">
+            <!-- Search Bar -->
+            <div class="col-3 container-fluid">
+                <div class="jumbotron">
+                    <h1>Search Field</h1>
+                    <p class="lead">Examples from other treebanks to help you tag.</p>
+                    <hr class="my-4">
+
+                    <div class="row container-fluid" style="width: 100%;">
+                        <!-- <input style="width: 80%;" class="col-8" type="text" name="search_txt0" id="search_txt0">
+                            <input type="button" class="btn btn-primary btn-md col-3 offset-1" style="width: 20%;" value="Search" onclick="search()"> -->
+                        <input style="width: 80%;" class="col-8" type="text" name="search_txt0" id="search_txt0">
+                        <input type="button" id="btn1" class="btn btn-primary btn-md col-3 offset-1" style="width: 20%;"
+                            value="Search" onclick="search()">
+                    </div>
+
+                    <div class="row container-fluid" style="width: 100%;margin-top: 10%;">
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3" id="search_txt1">
+                            <option>Baseword</option>
+                            <option>Enclitic</option>
+                            <option>Proclitic</option>
+                        </select>
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3 offset-1"
+                            id="search_txt2">
+                            <option>Approximate</option>
+                            <option>Exact</option>
+                        </select>
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3 offset-1"
+                            id="search_txt3">
+                            <option>Gulf Tags</option>
+                            <option>MSA Tags</option>
+                            <option>CODA Examples</option>
+                        </select>
+                    </div>
+                    <div class="row width: 100%">
+                        <div class="col-12">
+                            <div class="my-2" id="search_value" style="width: 100%;word-break: break-all">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="col-6" style="border-width: 2px;border-color: blue;">
+
+                <div class="row">
+                    <div class="col-12" style="width: 100%;">
+                        <input type="text" dir="rtl" name="raw" id="raw_txt" value=""
+                            style="width: 100%;font-size: 150%;margin-top: 5%;" onclick="GetSelection()"
+                            onkeypress="return false">
+                        <input type="text" dir="rtl" name="fixed_raw" id="fixed_raw_txt" value=""
+                            style="width: 100%;font-size: 200%;display: none; margin-top: 5%">
+                    </div>
+                </div>
+                <div class="row"></div>
+                <div class="row" style="width: 100%;">
+                    <input type="button" id="fix_sentence" class="col-6 offset-3 btn btn-primary" value="Fix Phrase"
+                        style="margin-top: 5%;" onclick="fixPhrase()">
+                    <div class="col-3"></div>
+                </div>
+
+                <div class="row" style="width: 100%;">
+                    <div id="newStr">
+
+                    </div>
+
+                </div>
+
+                </br>
+
+                <div class="row">
+                    <div id="newStrTags" style="margin: 5%;"></div>
+                </div>
+
+                <div class="row">
+                    <input type="button" class="btn btn-primary col-3" value="Reset All" onclick="reset()">
+                    <input type="button" class="btn btn-primary col-3 offset-1" value="Reset State"
+                        onclick="resetState()">
+                    <input type="button" class="btn btn-primary col-3 offset-1" value="Save and Next"
+                        onclick="nextPhrase()">
+                </div>
+
+            </div>
+
+            <!-- List of Phrases -->
+            <div class="col-3 container-fluid">
+                <div class="jumbotron">
+                    <h1>Sentences</h1>
+                    <p class="lead">Here are the sentences which should be annotated.</p>
+                    <div class="row container-fluid" style="width: 100%;">
+                        <input style="width: 80%; margin-right: 10%;" class="col-8" type="text" name="search_txt4"
+                            id="search_txt4">
+                        <span class="row float-right" style="margin-bottom: 10px;">
+                            {% if filtered%}
+                            <input class="btn btn-primary" type="button" id="filter_prev_btn" value="Back To Normal"
+                                onclick="searchPreviousAnnotations()">
+                            {% else %}
+                            <input class="btn btn-primary" type="button" id="filter_prev_btn" value="Filter By Search"
+                                onclick="searchPreviousAnnotations()">
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="row container-fluid" style="width: 100%;margin-top: 2%;">
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3" id="search_txt5">
+                            <option>Raw</option>
+                            <option>CODA</option>
+                            <option>Segments</option>
+                        </select>
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3 offset-1"
+                            id="search_txt6">
+                            <option>Text</option>
+                            <option>Verb Form</option>
+                            <option>POS</option>
+                            <option>Lemma</option>
+                        </select>
+                        <select style="width: 30%;" class="btn btn-secondary dropdown-toggle col-3 offset-1"
+                            id="search_txt7">
+                            <option>Approximate</option>
+                            <option>Exact</option>
+                        </select>
+                        <select style="width: 30%; margin-top: 5%;"
+                            class="btn btn-secondary dropdown-toggle col-3 offset-1" id="search_txt8">
+                            {% for text in annotators%}
+                            <option>{{text}}</option>
+                            {% endfor %}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="row float-right">
+                        {% if filtered%}
+                        <input class="btn btn-primary" type="button" id="filter_btn" value="Back To Normal"
+                            onclick="toggleFilter()">
+                        {% else %}
+                        <input class="btn btn-primary" type="button" id="filter_btn" value="Filter By Flag"
+                            onclick="toggleFilter()">
+                        {% endif %}
+                    </div>
+                    </br>
+                    <hr class="my-4">
+
+                    <div class="row container-fluid" style="width: 100%;">
+                        <ul class=”list-group list-group-flush” style="height: 100vh; overflow: auto;">
+                            {% for text in phrases%}
+                            <p dir="rtl" lang="ar" style="width: 100%;text-align: right;font-size: 150%;"
+                                onclick="SetText(this)">{{text}}</p>
+                            <hr class="my-2">
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var startStr = 0
+        var state = "denoise"
+        updateState()
+        // var phrasesArray = {{phrases|safe}}
+
+        var tags_txt = []
+        var raw_txt = []
+        var denoised_txt = []
+        var tags = []
+
+        var segment = []
+
+        var poses = []
+        var aspects = []
+        var persons = []
+        var genders = []
+        var numbers = []
+        var states = []
+        var voices = []
+        var moods = []
+        var flags = []
+        var lemmas = []
+        var verbForms = []
+
+        var delimiters = []
+
+        var original_txt = ""
+        var fixed_phrase = ""
+        var loaded_raw = ""
+
+        var beginTags = false
+
+        var searchObj = ""
+        var counterIds = 0
+        // Tags
+
+        var pos_vals = ["ABBREV", "ADJ", "ADJ_COMP", "ADJ_NUM", "ADV", "ADV_INTERROG", "ADV_REL", "CONJ", "CONJ_SUB", "DIGIT", "FORIEGN", "INTERJ", "NOUN", "NOUN_NUM", "NOUN_PROP", "NOUN_QUANT", "PART", "PART_CONNECT", "PART_DET", "PART_EMPHATIC", "PART_FOCUS", "PART_FUT", "PART_INTERROG", "PART_NEG", "PART_PROG", "PART_RC", "PART_RESTRICT", "PART_VERB", "PART_VOC", "PREP", "PRON", "PRON_DEM", "PRON_EXCLAM", "PRON_INTERROG", "PRON_REL", "PUNC", "VERB", "VERB_NOM", "VERB_PSEUDO"]
+        var aspecT_vals = ["P", "I", "C"]
+        var person_vals = ["1", "2", "3"]
+        var gender_vals = ["M", "F"]
+        var number_vals = ["S", "D", "P"]
+        var state_vals = ["D", "I", "C"]
+        var voice_vals = ["A", "P"]
+        var mood_vals = ["S", "I", "J"]
+        var verbForm_vals = ["t1", "t2"]
+
+        var searchBarExamples = document.getElementById('search_txt0');
+
+        // for(var i=0;i<phrasesArray.length;i++){
+        //     phrasesArray[i] = phrasesArray[i].replace("\n","")
+        // }
+
+        function updateState() {
+            let text = "The first state"
+            if (state === 'tags') {
+                document.getElementById("state").classList.remove('bg-primary');
+                document.getElementById("state").classList.add('bg-secondary');
+                text = "The second state"
+            }
+
+            else {
+                document.getElementById("state").classList.remove('bg-secondary');
+                document.getElementById("state").classList.add('bg-primary');
+            }
+
+
+            document.getElementById("state").innerHTML = text;
+
+        }
+
+        searchBarExamples.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                // Cancel the default action, if needed
+                event.preventDefault();
+                // Trigger the button element with a click
+                document.getElementById("btn1").click();
+            }
+        });
+
+        function fixPhrase() {
+            if (document.getElementById("fix_sentence").value == "Validate Fix") {
+                document.getElementById("raw_txt").value = document.getElementById("fixed_raw_txt").value
+                document.getElementById("fixed_raw_txt").style.display = "none"
+                document.getElementById("raw_txt").disabled = false
+                fixed_phrase = document.getElementById("fixed_raw_txt").value
+                document.getElementById("fix_sentence").value = "Fix Phrase"
+            }
+            else {
+                var str = document.getElementById("raw_txt").value
+                var var_raw_txt = document.getElementById("raw_txt")
+                var var_fixed_raw_txt = document.getElementById("fixed_raw_txt")
+
+                var_fixed_raw_txt.value = str
+                var_raw_txt.disabled = true
+                var_fixed_raw_txt.style.display = "inline-block"
+
+                document.getElementById("fix_sentence").value = "Validate Fix"
+            }
+        }
+
+        function postForm(path, params, method) {
+            method = method || 'post';
+
+            var form = document.createElement('form');
+            form.setAttribute('method', method);
+            form.setAttribute('action', path);
+
+            for (var key in params) {
+                if (params.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement('input');
+                    hiddenField.setAttribute('type', 'hidden');
+                    hiddenField.setAttribute('name', key);
+                    hiddenField.setAttribute('value', params[key]);
+
+                    form.appendChild(hiddenField);
+                }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function searchPreviousAnnotations() {
+            var filter_btn = document.getElementById("filter_prev_btn")
+            var search_txt4 = document.getElementById("search_txt4").value
+            var search_txt5 = document.getElementById("search_txt5").value
+            var search_txt6 = document.getElementById("search_txt6").value
+            var search_txt7 = document.getElementById("search_txt7").value
+            var search_txt8 = document.getElementById("search_txt8").value
+
+            var jsontoSend = {
+                search_txt4: search_txt4,
+                search_txt5: search_txt5,
+                search_txt6: search_txt6,
+                search_txt7: search_txt7,
+                search_txt8: search_txt8,
+            }
+
+            if (filter_prev_btn.value == "Filter By Search") {
+                filter_prev_btn.value = "Back To Normal"
+                // Load with Filters
+                postForm('/getSearchPreviousAnnotations/form', jsontoSend);
+            }
+            else if (filter_prev_btn.value == "Back To Normal") {
+                filter_prev_btn.value = "Filter By Search"
+                // Load without filters
+                window.location.href = "/";
+            }
+        }
+
+        function toggleFilter() {
+            var filter_btn = document.getElementById("filter_btn")
+            if (filter_btn.value == "Filter By Flag") {
+                filter_btn.value = "Back To Normal"
+                // Load with Filters
+                window.location.href = "/filteredRes";
+            }
+            else if (filter_btn.value == "Back To Normal") {
+                filter_btn.value = "Filter By Flag"
+                // Load without filters
+                window.location.href = "/";
+            }
+        }
+
+        function search() {
+            var search_txt0 = document.getElementById("search_txt0").value
+            var search_txt1 = document.getElementById("search_txt1").value
+            var search_txt2 = document.getElementById("search_txt2").value
+            var search_txt3 = document.getElementById("search_txt3").value
+
+            var jsontoSend = {
+                search_txt0: search_txt0,
+                search_txt1: search_txt1,
+                search_txt2: search_txt2,
+                search_txt3: search_txt3
+            }
+
+            var toSend = JSON.stringify(jsontoSend)
+            fetch(`/getSearch/${toSend}`)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (text) {
+                    console.log('GET response text:');
+                    console.log(text);
+                    var search_res = JSON.parse(text)
+                    parseSearch(search_res)
+                    // console.log(search_res);
+                });
+
+            document.getElementById("search_value").innerHTML = ""
+        }
+
+        function parseSearch(obj) {
+            searchObj = obj
+            // console.log(obj)
+            // var json = JSON.stringify(obj);
+            // console.log(json)
+
+            // Parent HTML
+            var searchField = document.getElementById("search_value")
+
+            if (document.getElementById("search_txt3").value == "CODA Examples") {
+                Object.keys(obj).forEach(pos_key => {
+                    var posKey = obj[pos_key]
+                    Object.keys(posKey).forEach(example => {
+                        searchField.innerHTML += '<li>' + example + ' : ' + posKey[example] + '</li>'
+                        // console.log(example+" : "+posKey[example])
+                    })
+                    searchField.innerHTML += '<hr class="my-4">'
+                })
+            }
+            else {
+                Object.keys(obj).forEach(pos_key => {
+                    // Div inside of it H1 Key BR
+                    searchField.innerHTML += '<p value="' + pos_key + '" onclick="parsePOS(this)">' + pos_key + '</p><hr class="my-4">'
+                    var posKey = obj[pos_key]
+                })
+            }
+        }
+
+        function parsePOS(posObj) {
+            console.log(searchObj[$(posObj).text()])
+            var searchField = document.getElementById("search_value")
+            var posKey = searchObj[$(posObj).text()]
+            searchField.innerHTML = '<div><p>' + $(posObj).text() + '</p>'
+            Object.keys(posKey).forEach(example => {
+                var example = posKey[example]
+                console.log(example.length)
+                Object.keys(example).forEach(field => {
+                    // console.log(field+" : "+example[field])
+                    searchField.innerHTML += '<li>' + field + ' : ' + example[field] + '</li>'
+                })
+                searchField.innerHTML += '<hr class="my-4">'
+            })
+            searchField.innerHTML += '</div>'
+        }
+
+        function loadPrevious(obj) {
+            fetch(`/getPreviousAnnotations/${obj}`)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (text) {
+                    console.log('GET response text:');
+                    generatePreviousAnnotations(text)
+                });
+        }
+
+        function checkIfAnnotated(obj) {
+            var vall = ""
+            fetch(`/getAnnotationStatus/${obj}`)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (text) {
+                    console.log('GET response text:');
+                    if (text == "annotated") {
+                        loadPrevious(obj)
+                        document.getElementById("fix_sentence").disabled = true
+                    }
+                    else {
+                        document.getElementById("fix_sentence").disabled = false
+                    }
+                });
+        }
+
+        function GetSelection() {
+            if (state == "denoise") {
+                GetSelectionDenoise()
+            }
+            else {
+                if (beginTags == true) {
+                    GetSelectionAddTag()
+                    beginTags = false
+                }
+                else {
+                    GetSelectionAddTag()
+                }
+            }
+        }
+
+        function GetSelectionDenoise() {
+            var delim = document.getElementById("raw_txt").selectionStart
+            var str = document.getElementById("raw_txt").value
+            var newStr = str.substring(startStr, delim)
+            document.getElementById("fix_sentence").disabled = true
+            raw_txt.push(newStr.trim())
+            delimiters.push(delim)
+            if (str[delim] == " ") {
+                delimiters.push(delim + 1)
+            }
+            if (str[delim - 1] == " ") {
+                delimiters.push(delim - 1)
+            }
+            document.getElementById("newStr").innerHTML += "<input dir=\"rtl\" type=\"text\" value=\"" + newStr + "\" style=\"font-size: 150%;\">"
+            document.getElementById("newStr").innerHTML += "</br>"
+            if (delim == str.length) {
+                startStr = 0
+                state = "tags"
+                updateState()
+                beginTags = true
+                return
+            }
+            startStr = delim
+            console.log(delimiters)
+        }
+
+        function getCorrespondingFeatures(selectedInput) {
+            var aspect =
+                '<div><label class="form-check-label">Aspect</label></div>' +
+                '<div><select name="aspect" class="aspect col-1" id="aspect"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            aspecT_vals.forEach(a => {
+                aspect += '<option value="' + a + '">' + a + '</option>'
+            });
+            aspect += "</select>"
+
+
+            var person =
+                '<div><label class="form-check-label">Person</label></div>' +
+                '<div><select name="person" class="person" id="person"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            person_vals.forEach(a => {
+                person += '<option value="' + a + '">' + a + '</option>'
+            });
+            person += "</select>"
+
+
+            var gender =
+                '<div><label class="form-check-label">Gender</label></div>' +
+                '<div><select name="gender" class="gender" id="gender"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            gender_vals.forEach(a => {
+                gender += '<option value="' + a + '">' + a + '</option>'
+            });
+            gender += "</select>"
+
+
+            var number =
+                '<div><label class="form-check-label">Number</label></div>' +
+                '<div><select name="number" class="number" id="number"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            number_vals.forEach(a => {
+                number += '<option value="' + a + '">' + a + '</option>'
+            });
+            number += "</select>"
+
+
+            var state =
+                '<div><label class="form-check-label">State</label></div>' +
+                '<div><select name="state" class="state" id="state"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            state_vals.forEach(a => {
+                state += '<option value="' + a + '">' + a + '</option>'
+            });
+            state += "</select>"
+
+
+            var voice =
+                '<div><label class="form-check-label">Voice</label></div>' +
+                '<div><select name="voice" class="voice" id="voice"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            voice_vals.forEach(a => {
+                voice += '<option value="' + a + '">' + a + '</option>'
+            });
+            voice += "</select>"
+
+
+            var mood =
+                '<div><label class="form-check-label">Mood</label></div>' +
+                '<div><select name="mood" class="mood" id="mood"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            mood_vals.forEach(a => {
+                mood += '<option value="' + a + '">' + a + '</option>'
+            });
+            mood += "</select>"
+
+            var verbForm =
+                '<div><label class="form-check-label">Verb Form</label></div>' +
+                '<div><select name="verbForm" class="verbForm" id="verbForm"></div>' +
+                '<option value="NONE" selected>NONE</option>'
+
+            verbForm_vals.forEach(a => {
+                verbForm += '<option value="' + a + '">' + a + '</option>'
+            });
+            verbForm += "</select>"
+
+            if (selectedInput.value == "ABBREV") {
+                var abbrevFeatures = aspect + person + gender + number + state + voice + mood + verbForm
+                selectedInput.nextSibling.innerHTML = abbrevFeatures
+            }
+            else if (selectedInput.value.startsWith("ADJ")) {
+                var adjFeatures = gender + number + verbForm
+                selectedInput.nextSibling.innerHTML = adjFeatures
+            }
+            else if (selectedInput.value.startsWith("NOUN")) {
+                var nounFeatures = gender + number + state + verbForm
+                selectedInput.nextSibling.innerHTML = nounFeatures
+            }
+            else if (selectedInput.value.startsWith("PRON")) {
+                var pronFeatures = person + gender + number
+                selectedInput.nextSibling.innerHTML = pronFeatures
+            }
+            else if (selectedInput.value.startsWith("VERB")) {
+                var verbFeatures = aspect + person + gender + number + voice + mood + verbForm
+                selectedInput.nextSibling.innerHTML = verbFeatures
+            }
+            else {
+                null
+            }
+        }
+
+        function GetSelectionAddTag() {
+            var delim = document.getElementById("raw_txt").selectionStart
+            var str = document.getElementById("raw_txt").value
+            var newStr = str.substring(startStr, delim)
+            tags.push(newStr.trim())
+            if (delimiters.includes(delim)) {
+                tags_txt.push(tags)
+                tags = []
+            }
+            var pos =
+                '<label class="form-check-label">POS</label><br/><br/>' +
+                '<select name="pos" class="pos col-1" onchange="getCorrespondingFeatures(this)"   id="' + counterIds + '" ' +
+                '<option value="NONE" selected>NONE</option>'
+
+            pos_vals.forEach(p => {
+                pos += '<option value="' + p + '">' + p + '</option>'
+            });
+            pos += "</select>"
+
+            var lemma = '<textarea class="lemma" id="lemma" name="lemma">' + newStr + '</textarea>'
+            var flag_Btn = '<button class="n_flag" value="' + newStr + '" onclick="TagSegment(this)">Flag</button></div>'
+
+            document.getElementById("newStrTags").innerHTML += "<div  class=\"row\" style=\"margin-top: 5%\">" + pos + "<div></div> <input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\"" + newStr + "\" style=\"font-size: 150%;\">"
+            document.getElementById("newStrTags").innerHTML += lemma
+            document.getElementById("newStrTags").innerHTML += flag_Btn
+            document.getElementById("newStrTags").innerHTML += "</br>"
+            counterIds += 1;
+            if (delim == str.length) {
+                console.log("TAGS : ", tags_txt)
+            }
+            startStr = delim
+        }
+
+        function saveCoda() {
+            denoised_txt = []
+            $('#newStr').find('input').each(function () {
+                denoised_txt.push($(this).val().trim());
+            });
+            state = "tags"
+            updateState()
+
+            console.log("RAW : ", raw_txt)
+            console.log("CODA : ", denoised_txt)
+        }
+
+        function SaveTags() {
+            segment = []
+
+            poses = []
+            aspects = []
+            persons = []
+            genders = []
+            numbers = []
+            states = []
+            voices = []
+            moods = []
+            flags = []
+            lemmas = []
+            verbForms = []
+
+            $('#newStrTags').find('.inpt').each(function () {
+                segment.push($(this).val().trim())
+            });
+            $('#newStrTags').find('.pos').each(function () {
+                poses.push($(this).val().trim())
+            });
+            $('#newStrTags').find('.aspect').each(function () {
+                aspects.push($(this).val())
+            });
+            $('#newStrTags').find('.person').each(function () {
+                persons.push($(this).val())
+            });
+            $('#newStrTags').find('.gender').each(function () {
+                genders.push($(this).val())
+            });
+            $('#newStrTags').find('.number').each(function () {
+                numbers.push($(this).val())
+            });
+            $('#newStrTags').find('.state').each(function () {
+                states.push($(this).val())
+            });
+            $('#newStrTags').find('.voice').each(function () {
+                voices.push($(this).val())
+            });
+            $('#newStrTags').find('.mood').each(function () {
+                moods.push($(this).val())
+            });
+            $('#newStrTags').find('.lemma').each(function () {
+                lemmas.push($(this).val())
+            });
+            $('#newStrTags').find('.verbForm').each(function () {
+                verbForms.push($(this).val())
+            });
+            $('#newStrTags').find("button").each(function () {
+                flags.push($(this).attr("class"))
+            })
+
+            state = "denoise"
+            updateState()
+            startStr = 0
+        }
+
+        function SetText() {
+            reset()
+            // var t = $(obj).text();
+            var t = "منستاهل اكتر لان بكره متل الغنم حينتخبوا نفس";
+            original_txt = t.replace("\n", "")
+            console.log("From Set Text Original : " + original_txt)
+            document.getElementById("raw_txt").value = t
+            // checkIfAnnotated(t)
+        }
+
+        function TagSegment(obj) {
+            if ($(obj).attr("class") == "n_flag") {
+                $(obj).text("UnFlag")
+                $(obj).attr('class', 'flag')
+            }
+            else {
+                $(obj).text("Flag")
+                $(obj).attr('class', 'n_flag')
+            }
+        }
+
+        function reset() {
+            document.getElementById("newStr").innerHTML = ""
+            document.getElementById("newStrTags").innerHTML = ""
+            tags_txt = []
+            raw_txt = []
+            denoised_txt = []
+            tags = []
+
+            segment = []
+            poses = []
+            aspects = []
+            persons = []
+            genders = []
+            numbers = []
+            states = []
+            voices = []
+            moods = []
+            flags = []
+            lemmas = []
+            verbForms = []
+
+            delimiters = []
+            state = "denoise"
+            updateState()
+            startStr = 0
+            loaded_raw = ""
+            // original_txt = ""
+            // fixed_phrase = ""
+            beginTags = false
+            document.getElementById("fix_sentence").disabled = false
+        }
+
+        function resetState() {
+            if (state == "denoise") {
+                reset()
+            }
+            else {
+                document.getElementById("newStrTags").innerHTML = ""
+                tags_txt = []
+                tags = []
+                segment = []
+
+                poses = []
+                aspects = []
+                persons = []
+                genders = []
+                numbers = []
+                states = []
+                voices = []
+                moods = []
+                flags = []
+                lemmas = []
+                verbForms = []
+
+                startStr = 0
+                beginTags = true
+            }
+        }
+
+        function generatePreviousAnnotations(text) {
+            delimiters = []
+            var annotaions = JSON.parse(text)
+            console.log(annotaions)
+            var coda = annotaions["coda"]
+            var segments = annotaions["segments"]
+            var delims = annotaions["delimiters"]
+            var fixed_phrs = annotaions["fixed"]
+            var original_phrs = annotaions["original"]
+
+            if (fixed_phrs != "") {
+                document.getElementById("raw_txt").value = fixed_phrs
+                original_txt = original_phrs
+                fixed_phrase = fixed_phrs
+            }
+            else {
+                document.getElementById("raw_txt").value = original_phrs
+                original_txt = original_phrs
+            }
+
+            if (coda.length != 0) {
+                state = "tags"
+                updateState()
+                beginTags = true
+                delimiters = delims
+            }
+            else {
+                state = "denoise"
+                updateState()
+            }
+
+            coda.forEach(c => {
+                document.getElementById("newStr").innerHTML += "<input class=\"row\" dir=\"rtl\" type=\"text\" value=\"" + c + "\" style=\"font-size: 150%\">"
+                document.getElementById("newStr").innerHTML += "</br>"
+            });
+
+            if (segments.length != 0) {
+                segments.forEach(s => {
+                    s.forEach(ss => {
+                        tags.push(ss["text"])
+                    })
+                    tags_txt.push(tags)
+                    tags = []
+                })
+
+                var ws = []
+                var wsl = []
+
+                segments.forEach(s => {
+                    s.forEach(ss => {
+                        var pos =
+                            '<select name="pos" class="pos" id="pos">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        pos_vals.forEach(p => {
+                            pos += '<option value="' + p + '">' + p + '</option>'
+                        });
+                        pos += "</select>"
+
+
+                        var aspect =
+                            '<select name="aspect" class="aspect" id="aspect">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        aspecT_vals.forEach(a => {
+                            aspect += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        aspect += "</select>"
+
+
+                        var person =
+                            '<select name="person" class="person" id="person">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        person_vals.forEach(a => {
+                            person += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        person += "</select>"
+
+
+                        var gender =
+                            '<select name="gender" class="gender" id="gender">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        gender_vals.forEach(a => {
+                            gender += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        gender += "</select>"
+
+
+                        var number =
+                            '<select name="number" class="number" id="number">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        number_vals.forEach(a => {
+                            number += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        number += "</select>"
+
+
+                        var state =
+                            '<select name="state" class="state" id="state">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        state_vals.forEach(a => {
+                            state += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        state += "</select>"
+
+
+                        var voice =
+                            '<select name="voice" class="voice" id="voice">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        voice_vals.forEach(a => {
+                            voice += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        voice += "</select>"
+
+
+                        var mood =
+                            '<select name="mood" class="mood" id="mood">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        mood_vals.forEach(a => {
+                            mood += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        mood += "</select>"
+
+
+                        var verbForm =
+                            '<select name="verbForm" class="verbForm" id="verbForm">' +
+                            '<option value="NONE" selected>NONE</option>'
+
+                        verbForm_vals.forEach(a => {
+                            verbForm += '<option value="' + a + '">' + a + '</option>'
+                        });
+                        verbForm += "</select>"
+
+                        var lemma = '<textarea class="lemma" id="lemma" name="lemma">' + ss["text"] + '</textarea>'
+
+                        var flag_Btn = '<button class="n_flag" value="' + newStr + '" onclick="TagSegment(this)">Flag Segment</button>'
+
+                        var flag_Btn = ""
+                        if (ss["flag"] == "n_flag") {
+                            flag_Btn = '<button class="' + ss["flag"] + '" value="' + ss["text"] + '" onclick="TagSegment(this)">Flag Segment</button>'
+                        }
+                        else {
+                            flag_Btn = '<button class="' + ss["flag"] + '" value="' + ss["text"] + '" onclick="TagSegment(this)">Unflag</button>'
+                        }
+
+                        document.getElementById("newStrTags").innerHTML += "<input dir=\"rtl\" class=\"inpt\" type=\"text\" value=\"" + ss["text"] + "\" style=\"font-size: 150%;\">"
+                        document.getElementById("newStrTags").innerHTML += pos
+                        document.getElementById("newStrTags").innerHTML += aspect
+                        document.getElementById("newStrTags").innerHTML += person
+                        document.getElementById("newStrTags").innerHTML += gender
+                        document.getElementById("newStrTags").innerHTML += number
+                        document.getElementById("newStrTags").innerHTML += state
+                        document.getElementById("newStrTags").innerHTML += voice
+                        document.getElementById("newStrTags").innerHTML += mood
+                        document.getElementById("newStrTags").innerHTML += verbForm
+                        document.getElementById("newStrTags").innerHTML += lemma
+                        document.getElementById("newStrTags").innerHTML += flag_Btn
+                        document.getElementById("newStrTags").innerHTML += "</br>"
+                        ws.push(ss["pos"])
+                        ws.push(ss["aspect"])
+                        ws.push(ss["person"])
+                        ws.push(ss["gender"])
+                        ws.push(ss["number"])
+                        ws.push(ss["state"])
+                        ws.push(ss["voice"])
+                        ws.push(ss["mood"])
+                        ws.push(ss["verbForm"])
+
+                        wsl.push(ss["lemma"])
+
+                        // ws.push(ss["flag"])
+                    })
+                })
+
+                var options = document.getElementById("newStrTags").getElementsByTagName("select")
+                var options2 = document.getElementById("newStrTags").getElementsByTagName("textarea")
+
+                for (var y = 0; y < options2.length; y++) {
+                    options2[y].value = wsl[y]
+                }
+
+                for (var x = 0; x < options.length; x++) {
+                    options[x].value = ws[x]
+                }
+            }
+        }
+
+        function sync() {
+            document.getElementById("loading").classList.remove('d-none');
+            fetch(`/sync`)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (text) {
+                    console.log('GET response:');
+                    console.log(text);
+                    document.getElementById("loading").classList.add('d-none');
+                });
+        }
+
+        function findPhraseIndex() {
+            // get raw text
+            // rtxt = document.getElementById("raw_txt").value
+            // search for it in the array from the back end
+            // get index of the phrase in the array
+            console.log("Original from Find Next : " + original_txt)
+            var phraseIndex = phrasesArray.indexOf(original_txt)
+            //returns index
+            return phraseIndex
+        }
+
+        function nextPhrase() {
+            SaveTags()
+            saveCoda()
+            //Get Current Index
+            var phraseIndex = findPhraseIndex()
+
+            // Change raw_txt input to the next phrase
+            if (phraseIndex + 1 > phrasesArray.length) {
+                alert("Last Phrase")
+            }
+            else {
+                document.getElementById("raw_txt").value = phrasesArray[phraseIndex + 1]
+                checkIfAnnotated(phrasesArray[phraseIndex + 1])
+
+                var segmentations = [
+
+                ]
+
+                for (var i = 0; i < tags_txt.length; i++) {
+                    var segs = []
+                    for (var j = 0; j < tags_txt[i].length; j++) {
+                        var indxx = segment.indexOf(tags_txt[i][j])
+                        var obj = {
+                            "text": segment[indxx],
+                            "pos": poses[indxx],
+                            "aspect": aspects[indxx],
+                            "person": persons[indxx],
+                            "gender": genders[indxx],
+                            "number": numbers[indxx],
+                            "state": states[indxx],
+                            "voice": voices[indxx],
+                            "mood": moods[indxx],
+                            "verbForm": verbForms[indxx],
+                            "lemma": lemmas[indxx],
+                            "flag": flags[indxx]
+                        }
+                        segs.push(obj)
+                    }
+                    segmentations.push(segs)
+                }
+
+                var jsontoSend = {
+                    original: original_txt,
+                    delimiters: delimiters,
+                    fixed: fixed_phrase,
+                    raw: raw_txt,
+                    coda: denoised_txt,
+                    segments: segmentations
+                }
+
+                reset()
+
+                console.log(jsontoSend)
+
+                var toSend = JSON.stringify(jsontoSend)
+                fetch(`/getdata/${toSend}`)
+                    .then(function (response) {
+                        return response.text();
+                    }).then(function (text) {
+                        console.log('GET response text:');
+                        console.log(text);
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>

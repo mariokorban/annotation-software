@@ -62,14 +62,39 @@
         display: none;
         text-align: center;
         }
+
+        input, select {
+            display: inline-block;
+            width: 10em;
+        }
+        label {
+            display: inline-block;
+            width: 10em;
+            margin-right: .5em;
+            padding-top: 1.5em;
+            text-align:center;
+        }
     </style>
 </head>
+
 <body>
-    <!-- <div id="load"></div> -->
+    <div
+        class="d-none"
+        id="loading"
+        style="width: 100vw; height:100%;opacity: 0.5;background-color: black ; display: flex; justify-content: center; align-items: center;position: absolute; z-index: 1;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    </div>
     <div class="container-fluid" id="contents">
             <div class="row container-fluid">
                 <div class="col-12">
-                    <center><h1 style="font-size:75px;background-color: blue;color: white;">ANNOTATOR</h1></center>
+                    <center>
+                        <h1 style="font-size:75px;background-color: blue;color: white;">ANNOTATOR</h1>
+                    </center>
+                    <p id="state" class="bg-primary"
+                        style="width: fit-content; color: white; padding: 5px; font-weight: bold;"></p>
                     <input type="button" class="btn btn-primary btn-md col-3 offset-1" style="width: 15%;" value="Sync Annotations" onclick="sync()">
                 </div>
             </div>
@@ -223,6 +248,7 @@
     <script type="text/javascript">
         var startStr = 0
         var state = "denoise"
+        updateState()
         var phrasesArray = {{phrases|safe}}
 
         var tags_txt = []
@@ -271,6 +297,24 @@
         for(var i=0;i<phrasesArray.length;i++){
             phrasesArray[i] = phrasesArray[i].replace("\n","")
         }
+
+        function updateState() {
+                let text = "The first state"
+                if (state === 'tags') {
+                    document.getElementById("state").classList.remove('bg-primary');
+                    document.getElementById("state").classList.add('bg-secondary');
+                    text = "The second state"
+                }
+
+                else {
+                    document.getElementById("state").classList.remove('bg-secondary');
+                    document.getElementById("state").classList.add('bg-primary');
+                }
+
+
+                document.getElementById("state").innerHTML = text;
+
+            }
 
         searchBarExamples.addEventListener("keyup", function (event) {
             if (event.keyCode === 13) {
@@ -500,6 +544,7 @@
             if (delim==str.length){
                 startStr = 0
                 state = "tags"
+                updateState()
                 beginTags = true
                 return
             }
@@ -509,90 +554,90 @@
 
         function getCorrespondingFeatures(selectedInput){
             var aspect =
-                '<div><label class="form-check-label">Aspect</label></div>' +
-                '<div><select name="aspect" class="aspect col-1" id="aspect"></div>' +
+                '<label class="form-check-label">Aspect' +
+                '<select name="aspect" class="aspect col-1" id="aspect" size="4">' +
                 '<option value="NONE" selected>NONE</option>'
 
             aspecT_vals.forEach(a => {
                 aspect += '<option value="' + a + '">' + a + '</option>'
             });
-            aspect += "</select>"
+            aspect += "</select></label>"
 
 
             var person =
-                '<div><label class="form-check-label">Person</label></div>' +
-                '<div><select name="person" class="person" id="person"></div>' +
+                '<label class="form-check-label">Person' +
+                '<select name="person" class="person" id="person" size="4">' +
                 '<option value="NONE" selected>NONE</option>'
 
             person_vals.forEach(a => {
                 person += '<option value="' + a + '">' + a + '</option>'
             });
-            person += "</select>"
+            person += "</select></label>"
 
 
             var gender =
-                '<div><label class="form-check-label">Gender</label></div>' +
-                '<div><select name="gender" class="gender" id="gender"></div>' +
+                '<label class="form-check-label">Gender' +
+                '<select name="gender" class="gender" id="gender" size="3">' +
                 '<option value="NONE" selected>NONE</option>'
 
             gender_vals.forEach(a => {
                 gender += '<option value="' + a + '">' + a + '</option>'
             });
-            gender += "</select>"
+            gender += "</select></label>"
 
 
             var number =
-                '<div><label class="form-check-label">Number</label></div>' +
-                '<div><select name="number" class="number" id="number"></div>' +
+                '<label class="form-check-label">Number' +
+                '<select name="number" class="number" id="number" size="4">' +
                 '<option value="NONE" selected>NONE</option>'
 
             number_vals.forEach(a => {
                 number += '<option value="' + a + '">' + a + '</option>'
             });
-            number += "</select>"
+            number += "</select></label>"
 
 
             var state =
-                '<div><label class="form-check-label">State</label></div>' +
-                '<div><select name="state" class="state" id="state"></div>' +
+                '<label class="form-check-label">State' +
+                '<select name="state" class="state" id="state" size="4">' +
                 '<option value="NONE" selected>NONE</option>'
 
             state_vals.forEach(a => {
                 state += '<option value="' + a + '">' + a + '</option>'
             });
-            state += "</select>"
+            state += "</select></label>"
 
 
             var voice =
-                '<div><label class="form-check-label">Voice</label></div>' +
-                '<div><select name="voice" class="voice" id="voice"></div>' +
+                '<label class="form-check-label">Voice' +
+                '<select name="voice" class="voice" id="voice" size="3">' +
                 '<option value="NONE" selected>NONE</option>'
 
             voice_vals.forEach(a => {
                 voice += '<option value="' + a + '">' + a + '</option>'
             });
-            voice += "</select>"
+            voice += "</select></label>"
 
 
             var mood =
-                '<div><label class="form-check-label">Mood</label></div>' +
-                '<div><select name="mood" class="mood" id="mood"></div>' +
+                '<label class="form-check-label">Mood' +
+                '<select name="mood" class="mood" id="mood" size="4">' +
                 '<option value="NONE" selected>NONE</option>'
 
             mood_vals.forEach(a => {
                 mood += '<option value="' + a + '">' + a + '</option>'
             });
-            mood += "</select>"
+            mood += "</select></label>"
 
             var verbForm =
-                '<div><label class="form-check-label">Verb Form</label></div>' +
-                '<div><select name="verbForm" class="verbForm" id="verbForm"></div>' +
+                '<label class="form-check-label">Verb Form' +
+                '<select name="verbForm" class="verbForm" id="verbForm"> size="4"' +
                 '<option value="NONE" selected>NONE</option>'
 
             verbForm_vals.forEach(a => {
                 verbForm += '<option value="' + a + '">' + a + '</option>'
             });
-            verbForm += "</select>"
+            verbForm += "</select></label>"
             
             if (selectedInput.value == "ABBREV") {
                 var abbrevFeatures = aspect + person + gender + number + state + voice + mood + verbForm
@@ -615,7 +660,7 @@
                 selectedInput.nextSibling.innerHTML = verbFeatures
             }
             else {
-                null
+                selectedInput.nextSibling.innerHTML = ""
             }
         }
         
@@ -629,8 +674,7 @@
                 tags = []
             }
             var pos = 
-            '<label class="form-check-label">POS</label><br/><br/>'+
-                    '<select name="pos" class="pos col-1" onchange="getCorrespondingFeatures(this)"   id="'+ counterIds +'" '+
+                    '<select name="pos" class="pos col-1" onchange="getCorrespondingFeatures(this)" id="'+ counterIds +'" style=\"height: 40%; width: 50%;\">'+
                         '<option value="NONE" selected>NONE</option>'
 
             pos_vals.forEach(p => {
@@ -641,7 +685,7 @@
             var lemma = '<textarea class="lemma" id="lemma" name="lemma">'+newStr+'</textarea>'
             var flag_Btn = '<button class="n_flag" value="'+newStr+'" onclick="TagSegment(this)">Flag</button></div>'
 
-            document.getElementById("newStrTags").innerHTML += "<div  class=\"row\" style=\"margin-top: 5%\">"+ pos +"<div></div> <input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%;\">"
+            document.getElementById("newStrTags").innerHTML += "<div id=\"pos&features\" class=\"row\" style=\"margin-top: 5%\"> <input dir=\"rtl\" class=\"inpt col-2\" type=\"text\" value=\""+newStr+"\" style=\"font-size: 150%; height: 20%\">" + pos + "<div id=\"features\"></div>"
             document.getElementById("newStrTags").innerHTML += lemma
             document.getElementById("newStrTags").innerHTML += flag_Btn
             document.getElementById("newStrTags").innerHTML += "</br>"
@@ -658,6 +702,7 @@
                 denoised_txt.push($(this).val().trim());
             });
             state = "tags"
+            updateState()
 
             console.log("RAW : ",raw_txt)
             console.log("CODA : ",denoised_txt)
@@ -716,6 +761,7 @@
             })
 
             state = "denoise"
+            updateState()
             startStr = 0
         }
 
@@ -762,6 +808,7 @@
 
             delimiters = []
             state = "denoise"
+            updateState()
             startStr = 0
             loaded_raw = ""
             // original_txt = ""
@@ -819,11 +866,13 @@
 
             if(coda.length != 0){
                 state = "tags"
+                updateState()
                 beginTags = true
                 delimiters = delims
             }
             else{
                 state = "denoise"
+                updateState()
             }
 
             coda.forEach(c => {
@@ -989,12 +1038,14 @@
         }
 
         function sync(){
+            document.getElementById("loading").classList.remove('d-none');
             fetch(`/sync`)
                 .then(function (response) {
                     return response.text();
                 }).then(function (text) {
                     console.log('GET response:');
-                    console.log(text); 
+                    console.log(text);
+                    document.getElementById("loading").classList.add('d-none');
                 });
         }
 
@@ -1075,4 +1126,5 @@
     }
     </script>
 </body>
+
 </html>
