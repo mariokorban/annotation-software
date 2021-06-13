@@ -228,6 +228,7 @@ def clone_repo(repo_dir='/Users/chriscay/thesis/annotation_wiaam',
         - Sets up a local branch in the annotator's name and its corresponding up-stream branch
     """
     annotations_name = f'{annotator_name}_annotations'
+    annotator_file_path = os.path.join(repo_dir, f'annotations_{annotator_name}.json')
 
     if not os.path.exists(repo_dir):
         repo_url = f"https://{username}:{auth_key}@github.com/{username}/{repo_name}.git"
@@ -240,18 +241,24 @@ def clone_repo(repo_dir='/Users/chriscay/thesis/annotation_wiaam',
                     for branch in remote_branches if re.match(r'\w+/\w+$', branch.strip(), re.M) and 'main' not in branch]
     if not bool([True for b in remote_branches if annotations_name in b]):
         annotations = repo.create_head(annotations_name)
+        if not os.path.exists(annotator_file_path):
+            with open(annotator_file_path, 'w') as f:
+                print([], file=f)
         # Pushing empty annotations branch
         annotations.checkout()
-        repo.git.add(A=True)
+        repo.git.add([annotator_file_path])
         repo.index.commit('Add empty annotations branch')
         repo.git.push('origin', annotations_name)
     else:
         repo.git.checkout(annotations_name)
         
-    annotator_file_path = os.path.join(repo_dir, f'annotations_{annotator_name}.json')
     if not os.path.exists(annotator_file_path):
         with open(annotator_file_path, 'w') as f:
             print([], file=f)
+    else:
+        repo.git.add([annotator_file_path])
+        repo.index.commit('Saving work without pushing to remote')
+
     
     repo.git.checkout('resources-inter-annotator')
     repo.git.pull('origin', 'resources-inter-annotator')

@@ -47,7 +47,11 @@ def index():
     else:
         texts = setup_environment()
         annotators = [a if a != USER else 'Me' for a in ANNOTATORS] + ['All But Me']
-        return render_template('index.html', phrases=texts, annotators=annotators, filtered=False)
+        return render_template('index.html',
+                               phrases=texts,
+                               annotated_indexes=checkIfAnnotatedPhrases(texts),
+                               annotators=annotators,
+                               filtered=False)
 
 @app.route('/annotator/<auth_key>', methods=['GET', 'POST'])
 def annotator(auth_key):
@@ -55,7 +59,11 @@ def annotator(auth_key):
         auth_key = request.form['auth_key']
         texts = setup_environment(auth_key)
         annotators = [a if a != USER else 'Me' for a in ANNOTATORS] + ['All But Me']
-        return render_template('index.html', phrases=texts, annotators=annotators, filtered=False)
+        return render_template('index.html',
+                               phrases=texts,
+                               annotated_indexes=checkIfAnnotatedPhrases(texts),
+                               annotators=annotators,
+                               filtered=False)
     else:
         return 'OK', 200
 
@@ -63,7 +71,11 @@ def annotator(auth_key):
 def filtered_index():
     filtered = parseFilteredText()
     annotators = [a if a != USER else 'Me' for a in ANNOTATORS] + ['All But Me']
-    return render_template('index.html', phrases=filtered, annotators=annotators, filtered=True)
+    return render_template('index.html',
+                           phrases=filtered,
+                           annotated_indexes=checkIfAnnotatedPhrases(filtered),
+                           annotators=annotators,
+                           filtered=True)
 
 
 def parseFilteredText():
@@ -158,6 +170,14 @@ def checkIfAnnotated(phrase):
         except:
             dataaz = {}            
 
+def checkIfAnnotatedPhrases(phrases):
+    with open(f"./annotations/annotations_{USER.lower()}.json", 'r') as fq:
+        try:
+            dataaz = [d["original"] for d in json.load(fq)]
+            return ["annotated" if p.strip() in dataaz else "notAnnotated" for p in phrases]
+        except:
+            dataaz = {}
+
 @app.route('/getSearch/<data>', methods=['GET','POST'])
 def get_search(data):
     if request.method == 'POST': 
@@ -183,8 +203,12 @@ def get_search_previous_annotations(data):
         filtered = methods.search_bar_previous_annotations(new_data["search_txt4"], dataaz, (
             new_data["search_txt5"], new_data["search_txt6"], new_data["search_txt7"], new_data["search_txt8"]))
         print(filtered)
-
-        return render_template('index.html', phrases=filtered, filtered=True)
+        annotators = [a if a != USER else 'Me' for a in ANNOTATORS] + ['All But Me']
+        return render_template('index.html',
+                               phrases=filtered,
+                               annotated_indexes=checkIfAnnotatedPhrases(filtered),
+                               annotators=annotators,
+                               filtered=True)
     else:  
         print(request.get_text())
         return 'OK', 200
