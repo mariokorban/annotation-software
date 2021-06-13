@@ -270,6 +270,7 @@
         var voices = []
         var moods = []
         var flags = []
+        var isMSAs = []
         var lemmas = []
         var verbForms = []
 
@@ -293,7 +294,7 @@
         var state_vals = ["D", "I", "C"]
         var voice_vals = ["A", "P"]
         var mood_vals = ["S", "I", "J"]
-        var verbForm_vals = ["t1","t2"]
+        var verbForm_vals = ["فَعَل" ,"فَعَّل", "فاعَل", "أفْعَل", "تَفَعَّل", "تَفاعَل", "اِنْفَعَل", "اِفْتَعَل", "اِفْعَل", "اِسْتَفْعَل", "اِفْعَال", "اِفْعَوْعَل", "اِفْعَوَّل", "فَعْلَل", "فَعْفَع", "فَعْوَعل", "فَعْفَل"]
 
         var searchBarExamples = document.getElementById('search_txt0');
 
@@ -699,13 +700,21 @@
             pos += "</select>"
 
             var lemma = '<textarea class="lemma" style="font-size: 150%" id="lemma" name="lemma">'+newStr+'</textarea>'
+            var isMSA =
+                '<select name="isMSA" class="isMSA" id="isMSA" size="3">' +
+                '<option value="Lebanese" selected>Lebanese</option>' +
+                '<option value="MSA">MSA</option>' +
+                '<option value="Other">Other</option>'
+
+            isMSA += "</select>"
+            
             var flag_Btn = '<button class="n_flag" value="'+newStr+'" onclick="TagSegment(this)">Flag</button></div>'
             
             pos_features = "<div id=\"pos&features\" class=\"row\" style=\"margin-top: 5%; background-color: rgb(190,190,190);\"> "
             pos_features += "<input dir=\"rtl\" class=\"inpt w-30\" type=\"text\" value=\"" + newStr + "\" style=\"font-size: 150%; height: 20%\" onkeypress=\"return false\">"
             pos_features += pos
             pos_features += "<div id=\"features\"></div>"
-            pos_features += lemma + flag_Btn + "</br>"
+            pos_features += lemma + isMSA + flag_Btn + "</br>"
             document.getElementById("newStrTags").innerHTML += pos_features
             counterIds +=1;
             if (delim==str.length){
@@ -738,6 +747,7 @@
             voices = []
             moods = []
             flags = []
+            isMSAs = []
             lemmas = []
             verbForms = []
 
@@ -783,6 +793,9 @@
             });
             $('#newStrTags').find('.lemma').each(function(){
                 lemmas.push($(this).val())
+            });
+            $('#newStrTags').find('.isMSA').each(function () {
+                isMSAs.push($(this).val().trim())
             });
             $('#newStrTags').find("button").each(function(){
                 flags.push($(this).attr("class"))
@@ -831,6 +844,7 @@
             voices = []
             moods = []
             flags = []
+            isMSAs = []
             lemmas = []
             verbForms = []
 
@@ -866,6 +880,7 @@
                 voices = []
                 moods = []
                 flags = []
+                isMSAs = []
                 lemmas = []
                 verbForms = []
 
@@ -939,6 +954,14 @@
 
                         var lemma = '<textarea class="lemma" style="font-size: 150%" id="lemma" name="lemma">' + ss["text"] + '</textarea>'
 
+                        var isMSA =
+                            '<select name="isMSA" class="isMSA" id="isMSA" size="3">' +
+                            '<option value="Lebanese" selected>Lebanese</option>' +
+                        '<option value="MSA">MSA</option>' +
+                        '<option value="Other">Other</option>'
+
+                        isMSA += "</select>"
+
                         var flag_Btn = ""
                         if(ss["flag"] == "n_flag"){
                             flag_Btn = '<button class="'+ss["flag"]+'" value="'+ss["text"]+'" onclick="TagSegment(this)">Flag</button></div></br>'
@@ -953,7 +976,7 @@
                         pos_features += "<input dir=\"rtl\" class=\"inpt w-30\" type=\"text\" value=\"" + ss["text"] + "\" style=\"font-size: 150%; height: 20%\" onkeypress=\"return false\">"
                         pos_features += pos
                         pos_features += "<div id=\"features\"></div>"
-                        pos_features += lemma + flag_Btn
+                        pos_features += lemma + isMSA + flag_Btn
                         document.getElementById("newStrTags").innerHTML += pos_features
                         counterIds += 1;
                         
@@ -967,6 +990,7 @@
                         if (ss["voice"] != null) { wss.push(ss["voice"]) }
                         if (ss["mood"] != null) { wss.push(ss["mood"]) }
                         if (ss["verbForm"] != null) { wss.push(ss["verbForm"]) }
+                        wss.push(ss["isMSA"])
                         ws.push(wss);
                         wsl.push(ss["lemma"])
                     })
@@ -1052,7 +1076,8 @@
                         "mood": moods[indxx],
                         "verbForm": verbForms[indxx],
                         "lemma": lemmas[indxx],
-                        "flag": flags[indxx]
+                        "flag": flags[indxx],
+                        "isMSA": isMSAs[indxx]
                     }
                     segs.push(obj)
                 }
