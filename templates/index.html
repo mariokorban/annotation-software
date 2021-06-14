@@ -858,6 +858,20 @@
             var phraseIndex = findPhraseIndex()
             if (resetAll != undefined && resetAll.id == 'resetAllButton'){
                 document.getElementById("phrase" + (phraseIndex + 1)).className = "";
+                var jsontoSend = {
+                    original: original_txt,
+                    "delete": "yes"
+                }
+                console.log(jsontoSend)
+
+                var toSend = JSON.stringify(jsontoSend)
+                fetch(`/getdata/${toSend}`)
+                    .then(function (response) {
+                        return response.text();
+                    }).then(function (text) {
+                        console.log('GET response text:');
+                        console.log(text);
+                    });
             }
         }
 

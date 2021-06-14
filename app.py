@@ -114,7 +114,8 @@ def data_get(toSend):
                         newData["raw"] = d["raw"]
                         dataaz.remove(d)
                         break
-                dataaz.append(newData)
+                if not newData.get("delete"):
+                    dataaz.append(newData)
                 with open(f"./annotations/annotations_{USER.lower()}.json", 'w') as f:
                     json.dump(dataaz, f, ensure_ascii = False)
                     return "Success"
