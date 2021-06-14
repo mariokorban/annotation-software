@@ -273,6 +273,7 @@
         var isMSAs = []
         var lemmas = []
         var verbForms = []
+        var nounForms = []
 
         var delimiters = []
 
@@ -295,6 +296,7 @@
         var voice_vals = ["A", "P"]
         var mood_vals = ["S", "I", "J"]
         var verbForm_vals = ["فَعَل" ,"فَعَّل", "فاعَل", "أفْعَل", "تَفَعَّل", "تَفاعَل", "اِنْفَعَل", "اِفْتَعَل", "اِفْعَل", "اِسْتَفْعَل", "اِفْعَال", "اِفْعَوْعَل", "اِفْعَوَّل", "فَعْلَل", "فَعْفَع", "فَعْوَعل", "فَعْفَل"]
+        var nounForm_vals = ["n1", "n2"]
 
         var searchBarExamples = document.getElementById('search_txt0');
 
@@ -655,9 +657,19 @@
                 verbForm += '<option value="' + a + '">' + a + '</option>'
             });
             verbForm += "</select></label>"
+
+            var nounForm =
+                '<label class="form-check-label">Noun Form' +
+                '<select name="nounForm" class="nounForm" id="nounForm"> size="3"' +
+                '<option value="NONE" selected>NONE</option>'
+
+            nounForm_vals.forEach(a => {
+                nounForm += '<option value="' + a + '">' + a + '</option>'
+            });
+            nounForm += "</select></label>"
             
             if (selectedInput.value == "ABBREV") {
-                var abbrevFeatures = aspect + person + gender + number + state + voice + mood + verbForm
+                var abbrevFeatures = aspect + person + gender + number + state + voice + mood + verbForm + nounForm
                 selectedInput.nextSibling.innerHTML = abbrevFeatures
             }
             else if (selectedInput.value.startsWith("ADJ")) {
@@ -665,7 +677,7 @@
                 selectedInput.nextSibling.innerHTML = adjFeatures
             }
             else if (selectedInput.value.startsWith("NOUN")) {
-                var nounFeatures = gender + number + state + verbForm
+                var nounFeatures = gender + number + state + nounForm
                 selectedInput.nextSibling.innerHTML = nounFeatures
             }
             else if (selectedInput.value.startsWith("PRON")) {
@@ -750,6 +762,7 @@
             isMSAs = []
             lemmas = []
             verbForms = []
+            nounForms = []
 
             var featuresSentence = {
                 "Aspect": aspects,
@@ -759,7 +772,8 @@
                 "State": states,
                 "Voice": voices,
                 "Mood": moods,
-                "Verb Form": verbForms
+                "Verb Form": verbForms,
+                "Noun Form": nounForms
             }
             var segmentsTags = document.getElementById("newStrTags").childNodes
             for (var i = 0; i < segmentsTags.length; i++) {
@@ -772,7 +786,8 @@
                         "State": "NA",
                         "Voice": "NA",
                         "Mood": "NA",
-                        "Verb Form": "NA"
+                        "Verb Form": "NA",
+                        "Noun Form": "NA"
                     }
                     for (var j = 0; j < segmentsTags[i].childNodes[3].childNodes.length; j++){
                         var featureName = segmentsTags[i].childNodes[3].childNodes[j].firstChild.nodeValue
@@ -847,6 +862,7 @@
             isMSAs = []
             lemmas = []
             verbForms = []
+            nounForms = []
 
             delimiters = []
             state = "denoise"
@@ -897,6 +913,7 @@
                 isMSAs = []
                 lemmas = []
                 verbForms = []
+                nounForms = []
 
                 startStr = 0
                 beginTags = true
@@ -1004,6 +1021,7 @@
                         if (ss["voice"] != null) { wss.push(ss["voice"]) }
                         if (ss["mood"] != null) { wss.push(ss["mood"]) }
                         if (ss["verbForm"] != null) { wss.push(ss["verbForm"]) }
+                        if (ss["nounForm"] != null) { wss.push(ss["nounForm"]) }
                         ws.push(wss);
                         wsl.push(ss["lemma"])
                     })
@@ -1090,6 +1108,7 @@
                         "voice": voices[indxx],
                         "mood": moods[indxx],
                         "verbForm": verbForms[indxx],
+                        "nounForm": nounForms[indxx],
                         "lemma": lemmas[indxx],
                         "flag": flags[indxx],
                         "isMSA": isMSAs[indxx]
