@@ -955,11 +955,10 @@
                         var lemma = '<textarea class="lemma" style="font-size: 150%" id="lemma" name="lemma">' + ss["text"] + '</textarea>'
 
                         var isMSA =
-                            '<select name="isMSA" class="isMSA" id="isMSA" size="3">' +
+                            '<select name="isMSA" class="isMSA" id="isMSA' + counterIds + '" size="3">' +
                             '<option value="Lebanese" selected>Lebanese</option>' +
                         '<option value="MSA">MSA</option>' +
                         '<option value="Other">Other</option>'
-
                         isMSA += "</select>"
 
                         var flag_Btn = ""
@@ -982,6 +981,7 @@
                         
                         var wss = [];
                         wss.push(ss["pos"])
+                        wss.push(ss["isMSA"])
                         if (ss["aspect"] != null) {wss.push(ss["aspect"])}
                         if (ss["person"] != null) { wss.push(ss["person"]) }
                         if (ss["gender"] != null) { wss.push(ss["gender"]) }
@@ -990,7 +990,6 @@
                         if (ss["voice"] != null) { wss.push(ss["voice"]) }
                         if (ss["mood"] != null) { wss.push(ss["mood"]) }
                         if (ss["verbForm"] != null) { wss.push(ss["verbForm"]) }
-                        wss.push(ss["isMSA"])
                         ws.push(wss);
                         wsl.push(ss["lemma"])
                     })
@@ -1004,11 +1003,13 @@
 
                 for(var i = 0; i < ws.length; i++){
                     var pos = document.getElementById(i.toString())
+                    var isMSA = document.getElementById('isMSA' + i.toString())
                     var features = document.getElementById("features" + i.toString())
                     pos.value = ws[i][0]
+                    isMSA.value = ws[i][1]
                     getCorrespondingFeatures(pos)
                     var k = 0
-                    for (let j = 1; j < ws[i].length; j++) {
+                    for (let j = 2; j < ws[i].length; j++) {
                         if (ws[i][j] != "NA"){
                             pos.nextSibling.childNodes[k].lastChild.value = ws[i][j]
                             k += 1
