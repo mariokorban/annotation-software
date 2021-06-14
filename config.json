@@ -1,5 +1,5 @@
 {
-    "current_annotator":"Wiaam",
+    "current_annotator":"Christian",
     "annotators": {
         "Wiaam": [
             "0"
@@ -10,14 +10,18 @@
         "Sara": [
             "2"
         ],
-        "Christian": [
+        "Magidah": [
             "3"
+        ],
+        "Christian": [
+            "4"
         ]
     },
     "usernames":{
         "Wiaam": "christios",
         "Carine": "christios",
         "Sara": "christios",
+        "Magidah": "christios",
         "Christian": "christios"
     }
 }
